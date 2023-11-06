@@ -14,7 +14,8 @@ to search for the available MPI versions, and then do something like:
 module load OpenMPI/4.1.4-GCC-11.3.0
 ```
 to load the exact module that you want. (On your system the exact name will be almost certainly
-be different.)
+be different.) The MPI variant you choose can have a significant performance impact, but for this
+demonstration project the differences are not relevant.
 
 ## Usage
 
@@ -36,6 +37,7 @@ to submit it to the Slurm queuing system.
 | Makefile         | Build instructions for the program. Do `make help` for details |
 | primes.c         | Count primes, parallelized with MPI                 |
 | primes-sbatch.sh | Slurm batch submission file                                    |
+| .gitignore  | A list of file patterns to ignore as candidates for GIT file management |
 
 # Message Passing Interface (MPI)
 
@@ -76,10 +78,10 @@ MPI_Recv(vector, SZ, MPI_DOUBLE, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
 The `MPI_Send()` and `MPI_Recv()` functions are used to send and receive data.
 For `MPI_Recv()` the sending rank may be `MPI_ANY_SOURCE`, which indicates data from any
 sender will be accepted. The actual sender is put in a field in `&status`.
-Similarly, receiver may specify `MPI_ANY_TAG`, tag is put in a field in status.
+Similarly, receiver may specify `MPI_ANY_TAG`, and the actual tag is put in a field in status.
 
 For small messages `MPI_Send()` will return immediately, for large messages an `MPI_Recv()` is needed to accept the
-data before `MPI_Send()` returns.
+data before `MPI_Send()` returns. This is a potential source of deadlocks.
 
 ## Combined Send/Receive
 
@@ -107,7 +109,8 @@ The combined send/receive operation is the first *collective* communication func
 
 ## Running an MPI program
 
-To run an MPI program in SLURM or similar batch systems, it is best to just use a special helper program `mpirun`.
+To run an MPI program in SLURM or similar batch systems, it is best to just use the special helper program `mpirun`.
+When you load a MPI module, see above, you usually also get a `mpirun`
 For example:
 ```shell script
 #!/bin/bash -e
